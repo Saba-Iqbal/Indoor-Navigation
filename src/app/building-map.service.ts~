@@ -1,0 +1,93 @@
+import { Injectable } from '@angular/core';
+
+/**
+  Declare the shape of BeaconRegion used by corodova plugin: com.unarin.cordova.beacon  
+*/
+export interface BeaconRegion{
+ identifier: string;
+ uuid: string;
+ major: number;
+ minor: number;
+}
+
+/**
+
+Declare the shape of each Beacon defined in the data.json. 
+
+*/
+export interface Beacon { 
+			major:number;
+        	        minor:number;
+        	        x: number ;
+			y: number ;
+			z: number;
+        	        walkable: boolean;
+                        tags: string[];
+                        connection: string[];
+                   }
+/**
+
+Declare the shape of each BeaconRegion defined in the data.json. BeaconRegion of cordova plugin is created using 
+this BeaconRegionJSON
+
+*/
+
+export interface BeaconRegionJSON { 
+ 			identifier: string;
+			major:number | null;
+        	        minor:number | null;
+        	        beacons: Beacon[];
+                   }
+/**
+
+Declare the shape of json data in data.json
+
+*/
+
+export interface BuildingMap { 
+  uuid: string;
+  distance_unit: string;
+  regions: BeaconRegionJSON[];
+}
+//
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class BuildingMapService {
+	private readonly _uuid: string;
+	private readonly _distance_unit: string;
+        private readonly _regions: BeaconRegionJSON[];
+        private readonly _buildingMap:BuildingMap; 
+	
+
+  constructor() 
+  {
+      this._buildingMap = require('../assets/data.json');
+      this._uuid = this._buildingMap.uuid;
+      this._distance_unit = this._buildingMap.distance_unit;
+      this._regions = this._buildingMap.regions;
+      console.log('BuildingMapService::Constructor');
+
+  }
+  //
+  get uuid(): string {return this._uuid;}
+  get distance_unit(): string {return this._distance_unit;}  
+  get buildingMap(): BuildingMap {return this._buildingMap; }
+  get regions(): BeaconRegion[] {
+    let regions:BeaconRegion[] = [];
+    for (let region of this._regions){
+        let r: BeaconRegion  = { identifier: region.identifier,
+                  major :  region.major,
+                  minor :  region.minor,
+                  uuid:   this.uuid
+        };
+        regions. push(r);
+        
+   }
+   return regions;     
+
+  }
+  
+}//class

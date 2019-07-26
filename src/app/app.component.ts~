@@ -1,0 +1,76 @@
+import { Component,OnInit } from '@angular/core';
+import { Platform } from '@ionic/angular';
+import { SplashScreen } from '@ionic-native/splash-screen/ngx';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
+import {BuildingMapService} from './building-map.service';
+
+
+@Component({
+  selector: 'app-root',
+  templateUrl: 'app.component.html'
+})
+export class AppComponent implements OnInit {
+ content:string;
+  constructor(
+    private platform: Platform,
+    private splashScreen: SplashScreen,
+    private statusBar: StatusBar,
+    private buildingMapService: BuildingMapService
+  ) {
+    console.log('app-roo: app.component.ts');
+    this.initializeApp();
+    
+  }
+  ngOnInit() {
+   console.log('app-roo: app.component.ts::ngOnInit');
+   //this.content = JSON.stringify (json);
+  }
+  
+  f (){
+   let delegate = new iBeaconplugins.locationManager.Delegate();
+	
+delegate.didDetermineStateForRegion = function (pluginResult) {
+
+    console && console.log('didDetermineStateForRegion' , pluginResult);
+};
+
+delegate.didStartMonitoringForRegion = function (pluginResult) {
+    console && console.log('didStartMonitoringForRegion' , pluginResult);
+};
+delegate.didRangeBeaconsInRegion = function (pluginResult) {
+  console && console.log('didRangeBeaconsInRegion',pluginResult.beacons[0].tx,pluginResult.beacons[0].rssi);
+}
+
+let uuid = 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825';
+let identifier = 'SBT';
+let major = 0;
+let beaconRegion = new iBeaconplugins.locationManager.BeaconRegion(identifier, uuid, major, 0);
+
+iBeaconplugins.locationManager.setDelegate(delegate);
+
+// required in iOS 8+
+//cordova.plugins.locationManager.requestWhenInUseAuthorization(); 
+// or cordova.plugins.locationManager.requestAlwaysAuthorization()
+
+iBeaconplugins.locationManager.startMonitoringForRegion(beaconRegion)
+	.fail(function(e) { console.error(e); })
+	.done();
+iBeaconplugins.locationManager.startRangingBeaconsInRegion(beaconRegion)
+	.fail(function(e) { console.error(e); })
+	.done();
+
+  }
+
+  initializeApp() {
+    
+    console.log ( this. buildingMapService.buildingMap );
+    console.log ( this. buildingMapService.regions );
+    this.platform.ready().then((readySource) => {
+      
+      console.log('Platform ready from', readySource);
+      this.statusBar.styleDefault();
+      this.splashScreen.hide();
+      //this.f();
+    });
+  }
+}
